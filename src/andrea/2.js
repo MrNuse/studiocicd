@@ -1,4 +1,4 @@
-export const isEven = (number) =>    {
+export const isEven = (number) => {
   const result = number % 2
 
   return result === 0
