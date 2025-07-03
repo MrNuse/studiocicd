@@ -1,0 +1,49 @@
+name: Test e Coverage
+
+# Quando eseguire questo workflow
+on:
+  push:
+    branches: [ main, develop, feature/** ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    name: Esegui Test e Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout del codice
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # 3. Installa le dipendenze
+      - name: Installa dipendenze
+        run: npm ci
+
+      # 4. Esegui i test con coverage
+      - name: Esegui test con coverage
+        run: npm run test:coverage
+
+      # 5. Upload del report di coverage (opzionale)
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 7
+
+      # 6. Commenta il PR con i risultati del coverage (opzionale)
+      - name: Coverage Report
+        uses: davelosert/vitest-coverage-report-action@v2
+        if: always() && github.event_name == 'pull_request'
+        with:
+          vite-config-path: ./vitest.config.js
