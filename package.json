@@ -11,7 +11,9 @@
     "lint": "eslint . --fix",
     "lint:check": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "build": "./scripts/build.sh",
+    "deploy": "./scripts/deploy.sh"
   },
   "author": "",
   "license": "ISC",

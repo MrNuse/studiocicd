@@ -25,6 +25,12 @@ npm run format        # Formatta tutto il codice
 npm run format:check  # Solo controlla formato (usato in CI)
 ```
 
+### Build e Deploy
+```bash
+npm run build         # Crea build ottimizzata in dist/
+npm run deploy        # Deploy manuale via SFTP (richiede env vars)
+```
+
 ## 📋 Workflow di Sviluppo
 
 1. **Scrivi il codice**
@@ -36,13 +42,20 @@ npm run format:check  # Solo controlla formato (usato in CI)
 
 ## 🔧 CI/CD Pipeline
 
-Ogni push esegue automaticamente:
+### Test Workflow (Ogni Push)
 1. **Format Check** - Verifica che il codice sia formattato
 2. **Lint Check** - Verifica che non ci siano errori di lint
 3. **Tests** - Esegue tutti i test
 4. **Coverage** - Verifica che il coverage sia ≥ 80%
 
-Se uno di questi step fallisce, il push viene bloccato.
+### Deploy Workflow (Solo Push su Main)
+1. **Esegue Test Workflow** - Deve passare per procedere
+2. **Build** - Crea build ottimizzata con `./scripts/build.sh`
+3. **Deploy SFTP** - Carica build sul server via `./scripts/deploy.sh`
+4. **Backup** - Crea backup del deployment precedente
+5. **Verifica** - Controlla che il deploy sia avvenuto correttamente
+
+Se uno di questi step fallisce, il deploy viene bloccato.
 
 ## 📁 Struttura del Progetto
 
@@ -62,8 +75,9 @@ src/
 ## 📖 Documentazione
 
 - [COVERAGE_TUTORIAL.md](./COVERAGE_TUTORIAL.md) - Come funziona il coverage
-- [LINTING_TUTORIAL.md](./LINTING_TUTORIAL.md) - Come funziona il linting
+- [LINTING_TUTORIAL.md](./LINTING_TUTORIAL.md) - Come funziona il linting  
 - [GITHUB_ACTIONS_TUTORIAL.md](./GITHUB_ACTIONS_TUTORIAL.md) - Come funziona la CI
+- [DEPLOY_TUTORIAL.md](./DEPLOY_TUTORIAL.md) - Come configurare e usare il deploy SFTP
 
 ## 🎓 Concetti Appresi
 
@@ -93,6 +107,13 @@ src/
 - Quality gates
 - Artifact storage
 
+### Deploy
+- Shell scripting per automazione
+- SFTP deployment
+- GitHub Secrets management
+- Backup automatico
+- Retry logic e error handling
+
 ## 🚨 Risoluzione Problemi
 
 ### Coverage Sotto 80%
@@ -120,8 +141,10 @@ npm run lint
 
 ## 🎯 Prossimi Passi
 
+- [x] ✅ Deploy automatico SFTP
 - [ ] Aggiungere TypeScript
-- [ ] Integrare con database
-- [ ] Deploy automatico
-- [ ] Notifiche Slack/Email
+- [ ] Integrare con database  
+- [ ] Notifiche Slack/Email per deploy
 - [ ] Performance testing
+- [ ] Deploy con chiavi SSH (più sicuro)
+- [ ] Multi-environment deploy (staging/production)

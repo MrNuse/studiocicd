@@ -1,0 +1,92 @@
+name: Deploy to Server
+
+# Quando eseguire questo workflow
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:  # Permette di eseguire manualmente
+
+jobs:
+  test:
+    name: Test e Coverage
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Installa dipendenze
+        run: npm ci
+
+      - name: Controlla formato codice
+        run: npm run format:check
+
+      - name: Controlla ESLint
+        run: npm run lint:check
+
+      - name: Esegui test con coverage
+        run: npm run test:coverage
+
+  deploy:
+    name: Deploy to Server
+    needs: test  # Esegue solo se i test passano
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Installa dipendenze
+        run: npm ci
+
+      - name: Installa sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
+      - name: Esegui build
+        run: ./scripts/build.sh
+
+      - name: Deploy via SFTP
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+          SFTP_PATH: ${{ secrets.SFTP_PATH }}
+          BACKUP_ENABLED: 'true'
+          CLEANUP_BUILD: 'false'
+        run: ./scripts/deploy.sh
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: build-artifacts
+          path: |
+            dist/
+            build-*.tar.gz
+          retention-days: 7
+
+      - name: Notifica successo
+        if: success()
+        run: |
+          echo "🎉 Deploy completato con successo!"
+          echo "🌐 Server: ${{ secrets.SFTP_HOST }}"
+          echo "📁 Percorso: ${{ secrets.SFTP_PATH }}"
+
+      - name: Notifica fallimento
+        if: failure()
+        run: |
+          echo "❌ Deploy fallito!"
+          echo "🔍 Controlla i log per maggiori dettagli"
