@@ -1,25 +1,20 @@
-import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
+describe('primi test con giorgino', () => {
+  const test = vi.fn()
 
-describe("primi test con giorgino" , () => {
-    const test = vi.fn()
+  beforeAll(() => {
+    test()
+  })
 
-    beforeAll(() => {
-     test()
-    })
+  beforeEach(() => {})
 
-    beforeEach(() => {
-    })
+  it('should expect true to be true', () => {
+    expect(test).toHaveBeenCalledOnce()
+  })
 
-    it("should expect true to be true", () => {
-        expect(test).toHaveBeenCalledOnce()
-    })
-
-    it("chimata di configurazione + chiamata manuale", () => {
-        test()
-        expect(test).toHaveBeenCalledTimes(2)
-    })
-
-
-
+  it('chimata di configurazione + chiamata manuale', () => {
+    test()
+    expect(test).toHaveBeenCalledTimes(2)
+  })
 })

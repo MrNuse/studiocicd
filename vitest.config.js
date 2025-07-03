@@ -14,14 +14,14 @@ export default defineConfig({
         'src/**/*.test.js',
         'src/**/*.spec.js',
         'coverage/**',
-        'dist/**'
+        'dist/**',
       ],
       thresholds: {
         lines: 80,
         functions: 80,
         branches: 80,
-        statements: 80
-      }
-    }
-  }
+        statements: 80,
+      },
+    },
+  },
 })
